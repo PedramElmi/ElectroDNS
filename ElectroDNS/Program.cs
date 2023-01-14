@@ -1,6 +1,7 @@
 ﻿using System.Management;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Security.Principal;
 
 namespace ElectroDNS
 {
@@ -13,24 +14,38 @@ namespace ElectroDNS
 
         static void Main(string[] args)
         {
-            Console.Title = "Auto ElectroDNS Changer";
-            Console.WriteLine("Auto ElectroDNS Changer by Pedram Elmi (pedram.elmi@gmail.com)");
+            Console.Title = "Auto ElectroDNS Switcher";
+            Console.WriteLine("Auto ElectroDNS Switcher");
             Console.WriteLine("Electro Website: https://electrotm.org");
-            Console.WriteLine("Github Repository: ")
-
-            var network = TryGetActiveEthernetOrWifiNetworkInterface();
-            if (network == null)
+            Console.WriteLine("GitHub Repository: https://github.com/PedramElmi/ElectroDNS");
+            if(IsAdministrator())
             {
-                return;
+                var network = TryGetActiveEthernetOrWifiNetworkInterface();
+                if(network == null)
+                {
+                    return;
+                }
+
+                Console.WriteLine("--------------------");
+
+                Switch(network);
             }
-
-            PrintNetworkInfo(network);
-            Console.WriteLine("--------------------");
-
-            Switch(network);
+            else
+            {
+                Console.ForegroundColor= ConsoleColor.Red;
+                Console.WriteLine("Please Run as Administrator");
+                Console.ResetColor();
+            }
 
             Console.WriteLine("Press Any Key to Exit...");
             Console.ReadKey();
+        }
+
+        public static bool IsAdministrator()
+        {
+            WindowsIdentity identity = WindowsIdentity.GetCurrent();
+            WindowsPrincipal principal = new WindowsPrincipal(identity);
+            return principal.IsInRole(WindowsBuiltInRole.Administrator);
         }
 
         static NetworkInterface? Switch(NetworkInterface? network)
@@ -48,25 +63,31 @@ namespace ElectroDNS
 
             if(dns.Contains(electroPreferedDns) && dns.Contains(electroAlternateDns))
             {
-                Console.WriteLine("Switched to Automatic DNS");
                 UnsetDNS(network);
                 network = TryGetActiveEthernetOrWifiNetworkInterface();
                 if(network == null)
                 {
                     return null;
                 }
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("UNSET (Automatic DNS)");
+                Console.ResetColor();
                 PrintNetworkInfo(network);
             }
             else
             {
-                Console.WriteLine("Switched to Electro DNS");
                 SetDNS(network, electroPreferedDns, electroAlternateDns);
                 network = TryGetActiveEthernetOrWifiNetworkInterface();
                 if(network == null)
                 {
                     return null;
                 }
+                Console.ForegroundColor = ConsoleColor.Magenta;
+                Console.WriteLine("SET (Electro DNS)");
+                Console.ResetColor();
                 PrintNetworkInfo(network);
+
+
             }
 
             return network;
@@ -77,7 +98,9 @@ namespace ElectroDNS
             var network = GetActiveEthernetOrWifiNetworkInterface();
             if(network is null)
             {
+                Console.ForegroundColor= ConsoleColor.Red;
                 Console.WriteLine("Could not find any Active Network. Try Again? (Y/N)");
+                Console.ResetColor();
                 Response = Console.ReadKey().Key.ToString();
                 if(Response.Equals("y", StringComparison.CurrentCultureIgnoreCase))
                 {

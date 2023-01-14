@@ -6,10 +6,29 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <StartupObject>ElectroDNS.Program</StartupObject>
+    <ApplicationIcon>electro.ico</ApplicationIcon>
+    <PackageProjectUrl>https://github.com/PedramElmi/ElectroDNS</PackageProjectUrl>
+    <Copyright>MIT license</Copyright>
+    <PackageIcon>electro.png</PackageIcon>
+    <RepositoryUrl>https://github.com/PedramElmi/ElectroDNS</RepositoryUrl>
+    <FileVersion>1.0.0</FileVersion>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="electro.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="System.Management" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="electro.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
